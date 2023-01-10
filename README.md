@@ -37,15 +37,19 @@ source .env
 az group create --subscription $SUBSCRIPTION \
                 --name $RESOURCE_GROUP \
                 --location $LOCATION
-az deployment group create--subscription $SUBSCRIPTION \
+az deployment group create --subscription $SUBSCRIPTION \
                            --resource-group $RESOURCE_GROUP \
                            --name rollout01 \
                            --template-file ARMTemplate/ServiceBus/template.json \
                            --parameters ARMTemplate/ServiceBus/parameters.json
-# Check servicebus properties
-# az servicebus namespace show --name $SERVICEBUS_NAMESPACE --resource-group $RESOURCE_GROUP
-# az servicebus queue show --name $SERVICEBUS_QUEUE --resource-group $RESOURCE_GROUP --namespace-name $SERVICEBUS_NAMESPACE
-# az servicebus topic show --name $SERVICEBUS_TOPIC --resource-group $RESOURCE_GROUP --namespace-name $SERVICEBUS_NAMESPACE
+```
+
+Check if service bus deploys successfully
+
+```bash
+az servicebus namespace show --name $SERVICEBUS_NAMESPACE --resource-group $RESOURCE_GROUP
+az servicebus queue show --name $SERVICEBUS_QUEUE --resource-group $RESOURCE_GROUP --namespace-name $SERVICEBUS_NAMESPACE
+az servicebus topic show --name $SERVICEBUS_TOPIC --resource-group $RESOURCE_GROUP --namespace-name $SERVICEBUS_NAMESPACE
 ```
 
 ## Step 3 Install azure sdk for python for demo example
@@ -74,18 +78,19 @@ export PRIMARY_CONNECTION_STRING="$(az servicebus namespace authorization-rule k
 export SECONDARY_CONNECTION_STRING="$(az servicebus namespace authorization-rule keys list --resource-group $RESOURCE_GROUP --namespace-name $SERVICEBUS_NAMESPACE --name RootManageSharedAccessKey | jq '.secondaryConnectionString' | tr -d '"')"
 ```
 
-Send message
+Send/receive message to/from queue
 
 ```bash
 source .env
 python example/send_message_queue.py 
+python example/receive_message_queue.py 
 ```
 
-Receive message
+Send/receive message to/from topic
 
 ```bash
 source .env
-python example/receive_message_queue.py 
+python example/send_receive_message_topic.py
 ```
 
 ## Finally Delete resources
