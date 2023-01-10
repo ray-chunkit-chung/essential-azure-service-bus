@@ -3,6 +3,8 @@ local/
 __azurite*
 __blob*
 __queue*
+get-pip.py
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
