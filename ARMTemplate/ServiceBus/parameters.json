@@ -7,6 +7,15 @@
     },
     "serviceBusQueueName": {
       "value": "test2queue"
+    },
+    "serviceBusTopicName": {
+      "value": "test2topic"
+    },
+    "serviceBusSubscriptionName": {
+      "value": "test2subscription"
+    },
+    "serviceBusRuleName": {
+      "value": "test2rule"
     }
   }
 }
