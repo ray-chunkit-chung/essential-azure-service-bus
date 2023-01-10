@@ -4,6 +4,8 @@ add an Azure service bus
 
 <https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-resource-manager-namespace-queue>
 
+<https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-resource-manager-namespace-topic>
+
 <https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-python-how-to-use-topics-subscriptions>
 
 ## Step 1 Login azure
@@ -35,7 +37,7 @@ source .env
 az group create --subscription $SUBSCRIPTION \
                 --name $RESOURCE_GROUP \
                 --location $LOCATION
-az deployment group create --subscription $SUBSCRIPTION \
+az deployment group create--subscription $SUBSCRIPTION \
                            --resource-group $RESOURCE_GROUP \
                            --name rollout01 \
                            --template-file ARMTemplate/ServiceBus/template.json \
@@ -43,13 +45,8 @@ az deployment group create --subscription $SUBSCRIPTION \
 # Check servicebus properties
 # az servicebus namespace show --name $SERVICEBUS_NAMESPACE --resource-group $RESOURCE_GROUP
 # az servicebus queue show --name $SERVICEBUS_QUEUE --resource-group $RESOURCE_GROUP --namespace-name $SERVICEBUS_NAMESPACE
+# az servicebus topic show --name $SERVICEBUS_TOPIC --resource-group $RESOURCE_GROUP --namespace-name $SERVICEBUS_NAMESPACE
 ```
-
-TODO: Add servicebus topic example
-
-<https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-resource-manager-namespace-topic>
-
-<https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-python-how-to-use-topics-subscriptions>
 
 ## Step 3 Install azure sdk for python for demo example
 
@@ -70,18 +67,25 @@ from azure.servicebus import ServiceBusClient, ServiceBusMessage
 
 ## Step 4 Try send and receive messages
 
+On service bus deployment, default authorization-rule keys with Name=RootManageSharedAccessKey are generated. We need the key to send & receive messages used in python script
+
+```bash
+export PRIMARY_CONNECTION_STRING="$(az servicebus namespace authorization-rule keys list --resource-group $RESOURCE_GROUP --namespace-name $SERVICEBUS_NAMESPACE --name RootManageSharedAccessKey | jq '.primaryConnectionString' | tr -d '"')"
+export SECONDARY_CONNECTION_STRING="$(az servicebus namespace authorization-rule keys list --resource-group $RESOURCE_GROUP --namespace-name $SERVICEBUS_NAMESPACE --name RootManageSharedAccessKey | jq '.secondaryConnectionString' | tr -d '"')"
+```
+
 Send message
 
 ```bash
 source .env
-python example/receive_message.py 
+python example/send_message_queue.py 
 ```
 
 Receive message
 
 ```bash
 source .env
-python example/receive_message.py 
+python example/receive_message_queue.py 
 ```
 
 ## Finally Delete resources
