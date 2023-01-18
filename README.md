@@ -114,3 +114,55 @@ Delete them by
 source .env
 az group delete --name $(az group list --subscription $SUBSCRIPTION | jq '.[].name' | tr -d '"')
 ```
+
+## Bonus A Messaging with cosmos db via logic app  
+
+Create a comos db
+```bash
+source .env
+az group create --name $RESOURCE_GROUP \
+                --location $LOCATION
+az cosmosdb create \
+    --resource-group $RESOURCE_GROUP \
+    --name $COSMOS_NAME \
+    --locations regionName=$LOCATION
+export COSMOS_CONNECTION_STRING="$(az cosmosdb keys list \
+        --type connection-strings \
+        --resource-group $RESOURCE_GROUP \
+        --name $COSMOS_NAME \
+    | jq '.connectionStrings[0].connectionString' \
+    | tr -d '"')"
+export COSMOS_ENDPOINT="$(az cosmosdb show \
+        --resource-group $RESOURCE_GROUP \
+        --name $COSMOS_NAME \
+        --query "documentEndpoint" \
+    | tr -d '"')"
+export COSMOS_KEY="$(az cosmosdb keys list \
+        --resource-group $RESOURCE_GROUP \
+        --name $COSMOS_NAME \
+    | jq '.primaryMasterKey' \
+    | tr -d '"')"
+```
+
+```bash
+sudo apt-get install -y python3 python3-dev python3-venv
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade -r requirements.txt
+python example/run_sql_cosmos.py
+```
+
+
+
+
+## Bonus B  SQL CDC 
+Service b
+<https://stackoverflow.com/questions/69319332/azure-service-bus-post-to-a-queue-and-a-topic-inside-transaction-scope>
+
+SQL CDC with Kafka
+<https://hevodata.com/learn/kafka-cdc-sql-server/#m1>
+
+SQL CDC with Event Hub
+https://www.sqlservercentral.com/blogs/streaming-etl-sql-change-data-capture-cdc-to-azure-event-hub-2
+https://github.com/rolftesmer/SQLCDC2EventHub
+https://www.sqlservercentral.com/blogs/streaming-etl-sql-change-data-capture-cdc-to-azure-event-hub
