@@ -55,12 +55,14 @@ az servicebus topic show --name $SERVICEBUS_TOPIC --resource-group $RESOURCE_GRO
 ## Step 3 Install azure sdk for python for demo example
 
 ```bash
-sudo apt-get install -y python3 python3-dev
-sudo ln -sf /usr/bin/python3 /usr/bin/python
-export PYTHONPATH=/usr/bin/python
-curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-sudo python get-pip.py
-sudo pip install azure-servicebus
+sudo apt-get install -y python3 python3-dev python3-venv
+python3 -m venv .venv
+source .venv/bin/activate
+# sudo ln -sf /usr/bin/python3 /usr/bin/python
+# export PYTHONPATH=/usr/bin/python
+# curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+# sudo python get-pip.py
+pip install --upgrade -r requirements.txt
 ```
 
 Check if install successful
@@ -117,7 +119,11 @@ az group delete --name $(az group list --subscription $SUBSCRIPTION | jq '.[].na
 
 ## Bonus A Messaging with cosmos db via logic app  
 
-Create a comos db
+Connection between logic app and cosmos
+<https://learn.microsoft.com/en-us/azure/connectors/connectors-create-api-cosmos-db?tabs=standard>
+
+### Step A1 Create a comos db
+
 ```bash
 source .env
 az group create --name $RESOURCE_GROUP \
@@ -137,7 +143,7 @@ export COSMOS_ENDPOINT="$(az cosmosdb show \
         --name $COSMOS_NAME \
         --query "documentEndpoint" \
     | tr -d '"')"
-export COSMOS_KEY="$(az cosmosdb keys list \
+export COSMOS_KEY="$(az cosmosdb keys list \0
         --resource-group $RESOURCE_GROUP \
         --name $COSMOS_NAME \
     | jq '.primaryMasterKey' \
@@ -152,10 +158,16 @@ pip install --upgrade -r requirements.txt
 python example/run_sql_cosmos.py
 ```
 
+```bash
+az deployment group create --subscription $SUBSCRIPTION \
+                           --resource-group $RESOURCE_GROUP \
+                           --name rollout01 \
+                           --template-file ARMTemplate/LogicAppStandard/template.json \
+                           --parameters ARMTemplate/LogicAppStandard/parameters.json
+```
 
+## Bonus B  SQL CDC
 
-
-## Bonus B  SQL CDC 
 Service b
 <https://stackoverflow.com/questions/69319332/azure-service-bus-post-to-a-queue-and-a-topic-inside-transaction-scope>
 
@@ -163,6 +175,6 @@ SQL CDC with Kafka
 <https://hevodata.com/learn/kafka-cdc-sql-server/#m1>
 
 SQL CDC with Event Hub
-https://www.sqlservercentral.com/blogs/streaming-etl-sql-change-data-capture-cdc-to-azure-event-hub-2
-https://github.com/rolftesmer/SQLCDC2EventHub
-https://www.sqlservercentral.com/blogs/streaming-etl-sql-change-data-capture-cdc-to-azure-event-hub
+<https://www.sqlservercentral.com/blogs/streaming-etl-sql-change-data-capture-cdc-to-azure-event-hub-2>
+<https://github.com/rolftesmer/SQLCDC2EventHub>
+<https://www.sqlservercentral.com/blogs/streaming-etl-sql-change-data-capture-cdc-to-azure-event-hub>

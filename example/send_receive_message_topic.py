@@ -35,6 +35,7 @@ def send_batch_message(sender):
 servicebus_client = ServiceBusClient.from_connection_string(
     conn_str=CONNECTION_STR, logging_enable=True)
 
+# Send message
 with servicebus_client:
     sender = servicebus_client.get_topic_sender(topic_name=TOPIC_NAME)
     with sender:
@@ -45,6 +46,7 @@ with servicebus_client:
 print("Done sending messages")
 print("-----------------------")
 
+# Receive message
 with servicebus_client:
     receiver = servicebus_client.get_subscription_receiver(
         topic_name=TOPIC_NAME, subscription_name=SUBSCRIPTION_NAME, max_wait_time=5)
